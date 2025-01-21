@@ -1,0 +1,62 @@
+name: PhytiumPi-4GB-Build
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare_release:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          format: 'YYYYMMDD-HHmm'
+      - name: Create empty release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.time.outputs.time }}
+          body_path: VERSION
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: main
+          draft: false
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+  build:
+    runs-on: ubuntu-22.04-arm
+    needs: prepare_release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        shell: bash
+        run: |
+          git clone https://gitee.com/openeuler/SBC-sig --depth=1
+          cd SBC-sig/scripts/rockchip/
+          sudo bash build-image-docker.sh \
+                    --board phytiumpi-4gb \
+                    -d https://repo.openeuler.org/openEuler-22.03-LTS-SP3/docker_img/aarch64/openEuler-docker.aarch64.tar.xz \
+                    -n openEuler-24.03-LTS-PhytiumPi-4GB-aarch64-alpha1 \
+                    -k https://gitee.com/openeuler/phytium-kernel.git \
+                    -b openEuler-24.03-LTS-Phytium \
+                    -c phytium_defconfig \
+                    -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo \
+                    -s headless
+      - name: Upload
+        if: needs.prepare_release.outputs.release_id != ''
+        uses: xresloader/upload-to-github-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.prepare_release.outputs.release_id }}
+          file: "./SBC-sig/scripts/rockchip/build/*/*.img.xz*"
+          draft: false
+      - name: Rollback release
+        if: failure() && needs.prepare_release.outputs.release_id != ''
+        uses: author/action-rollback@stable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.prepare_release.outputs.release_id }}
