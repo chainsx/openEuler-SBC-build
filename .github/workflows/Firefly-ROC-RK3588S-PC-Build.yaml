@@ -33,7 +33,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://gitee.com/openeuler/SBC-sig --depth=1
+          git clone https://gitee.com/chainsx/SBC-sig --depth=1 -b master
           cd SBC-sig/scripts/rockchip/
           sudo bash build-image-docker.sh --board firefly-roc-rk3588s-pc -d https://repo.openeuler.org/openEuler-22.03-LTS-SP3/docker_img/aarch64/openEuler-docker.aarch64.tar.xz -n openEuler-22.03-LTS-SP3-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c openeuler_rockchip_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -s headless
       - name: Upload
