@@ -4,7 +4,7 @@ on:
 
 jobs:
   prepare_release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
     outputs:
       release_id: ${{ steps.release.outputs.id }}
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04-arm
     needs: prepare_release
     steps:
       - name: Checkout
@@ -33,9 +33,17 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://gitee.com/openeuler/rockchip --depth=1
-          cd rockchip/scripts
-          sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -s headless
+          git clone https://gitee.com/chainsx/SBC-sig --depth=1 -b master
+          cd SBC-sig/scripts/rockchip/
+          sudo bash build-image-docker.sh \
+               --board firefly-itx-3588j \
+               -d https://repo.openeuler.org/openEuler-22.03-LTS-SP3/docker_img/aarch64/openEuler-docker.aarch64.tar.xz \
+               -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 \
+               -k https://gitee.com/openeuler/rockchip-kernel.git \
+               -b openEuler-22.03-LTS-RK3588 \
+               -c openeuler_rockchip_defconfig \
+               -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo \
+               -s xfce
       - name: Upload
         if: needs.prepare_release.outputs.release_id != ''
         uses: xresloader/upload-to-github-release@v1
@@ -43,7 +51,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ needs.prepare_release.outputs.release_id }}
-          file: "./rockchip/scripts/build/*/*.img.xz*"
+          file: "./SBC-sig/scripts/rockchip/build/*/*.img.xz*"
           draft: false
       - name: Rollback release
         if: failure() && needs.prepare_release.outputs.release_id != ''
@@ -52,7 +60,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ needs.prepare_release.outputs.release_id }}
-      - name: Clean
-        shell: bash
-        run: |
-          sudo rm -rf rockchip
