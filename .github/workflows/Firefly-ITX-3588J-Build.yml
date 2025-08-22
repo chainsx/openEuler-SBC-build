@@ -37,7 +37,7 @@ jobs:
           cd SBC-sig/scripts/rockchip/
           sudo bash build-image-docker.sh \
                --board firefly-itx-3588j \
-               -d https://repo.openeuler.org/openEuler-22.03-LTS-SP3/docker_img/aarch64/openEuler-docker.aarch64.tar.xz \
+               -d https://repo.openeuler.org/openEuler-22.03-LTS/docker_img/aarch64/openEuler-docker.aarch64.tar.xz \
                -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 \
                -k https://gitee.com/openeuler/rockchip-kernel.git \
                -b openEuler-22.03-LTS-RK3588 \
