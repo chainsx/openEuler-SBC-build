@@ -33,7 +33,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://gitee.com/chainsx/SBC-sig --depth=1 -b master
+          git clone https://gitee.com/chainsx/SBC-sig --depth=1 -b test
           cd SBC-sig/scripts/rockchip/
           sudo bash build-image-docker.sh \
                --board firefly-itx-3588j \
