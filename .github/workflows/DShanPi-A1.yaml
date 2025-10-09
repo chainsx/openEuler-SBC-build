@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           git clone https://gitee.com/chainsx/SBC-sig --depth=1
-          cd SBC-sig/scripts/rockchip/
+          cd SBC-sig/scripts
           sudo bash build-image-docker.sh \
                              --board dshanpi-a1 \
                              -d https://repo.openeuler.org/openEuler-22.03-LTS-SP3/docker_img/aarch64/openEuler-docker.aarch64.tar.xz \
@@ -51,7 +51,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ needs.prepare_release.outputs.release_id }}
-          file: "./SBC-sig/scripts/rockchip/build/*/*.img.xz*"
+          file: "./SBC-sig/scripts/build/*/*.img.xz*"
           draft: false
       - name: Rollback release
         if: failure() && needs.prepare_release.outputs.release_id != ''
