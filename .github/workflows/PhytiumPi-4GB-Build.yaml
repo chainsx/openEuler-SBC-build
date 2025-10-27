@@ -33,7 +33,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://gitee.com/woqidaideshi/SBC-sig -b master --depth=1
+          git clone https://gitee.com/chainsx/SBC-sig -b master --depth=1
           cd SBC-sig/scripts
           sudo bash build-image-docker.sh \
                     --board phytiumpi-4gb \
